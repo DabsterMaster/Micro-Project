@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "Exam Proctor Extension - IEEE Standard",
+  "version": "2.0.0",
+  "description": "IEEE Standard Compliant AI-powered exam monitoring system using YOLO v8 ML for real-time proctoring",
+  "author": "Exam Proctor Team",
+  "homepage_url": "https://github.com/yourusername/exam-proctor-extension",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "desktopCapture",
+    "storage",
+    "identity",
+    "notifications",
+    "webNavigation",
+    "webRequest",
+    "camera",
+    "microphone"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Exam Proctor"
+  },
+  "description": "IEEE Standard Compliant AI-powered exam monitoring system using YOLO v8 ML for real-time proctoring",
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "yolo-worker.js",
+        "yolo-model-loader.js",
+        "security-manager.js",
+        "professional-monitoring.js",
+        "models/*",
+        "firebase/*",
+        "firebase-app-compat.js",
+        "firebase-auth-compat.js",
+        "firebase-firestore-compat.js",
+        "firebase-functions-compat.js",
+        "camera-test.html"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
+  },
+  "minimum_chrome_version": "88"
+}

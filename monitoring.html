@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Exam Proctor - Live Monitoring</title>
+    <link rel="stylesheet" href="monitoring.css">
+</head>
+<body>
+    <div class="monitoring-container">
+        <header class="monitoring-header">
+            <div class="header-left">
+                <h1>Live Exam Monitoring</h1>
+                <div class="exam-info">
+                    <span id="examTitle">Loading exam...</span>
+                    <span id="examCode"></span>
+                    <span id="examTimer" style="background: rgba(239, 68, 68, 0.2); border-color: #ef4444;">⏱️ --:--:--</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="status-indicator">
+                    <span class="status-dot active"></span>
+                    <span class="status-text">Monitoring Active</span>
+                </div>
+                <div class="controls">
+                    <input type="text" id="manualExamCode" placeholder="Enter exam code" style="margin-right: 10px; padding: 5px; border-radius: 4px; border: 1px solid #4a5568;">
+                    <button id="loadExamBtn" class="btn btn-primary">Load Exam</button>
+                    <button id="pauseBtn" class="btn btn-warning">Pause</button>
+                    <button id="settingsBtn" class="btn btn-secondary">Settings</button>
+                    <button id="debugBtn" class="btn btn-info">Debug</button>
+                    <button id="closeBtn" class="btn btn-danger">Close</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="monitoring-main">
+            <div class="monitoring-grid" id="monitoringGrid">
+                <!-- Examinee monitoring tiles will be dynamically added here -->
+                <div class="loading-placeholder">
+                    <div class="spinner"></div>
+                    <p>Loading examinee feeds...</p>
+                </div>
+            </div>
+        </main>
+
+        <aside class="monitoring-sidebar">
+            <div class="sidebar-section">
+                <h3>Active Examinees</h3>
+                <div class="examinee-list" id="examineeList">
+                    <!-- Examinee list will be populated here -->
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Recent Violations</h3>
+                <div class="violations-list" id="violationsList">
+                    <!-- Violations will be populated here -->
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>System Status</h3>
+                <div class="system-status">
+                    <div class="status-item">
+                        <span class="label">Total Examinees:</span>
+                        <span class="value" id="totalExaminees">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Active Feeds:</span>
+                        <span class="value" id="activeFeeds">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">Violations Today:</span>
+                        <span class="value" id="violationsToday">0</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="label">System Uptime:</span>
+                        <span class="value" id="systemUptime">0h 0m</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Monitoring Settings</h2>
+                <button class="modal-close" id="closeSettings">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label for="yoloConfidence">YOLO Confidence Threshold:</label>
+                    <input type="range" id="yoloConfidence" min="0.1" max="1.0" step="0.1" value="0.5">
+                    <span id="confidenceValue">0.5</span>
+                </div>
+                <div class="setting-group">
+                    <label for="yoloNMS">YOLO NMS Threshold:</label>
+                    <input type="range" id="yoloNMS" min="0.1" max="1.0" step="0.1" value="0.4">
+                    <span id="nmsValue">0.4</span>
+                </div>
+                <div class="setting-group">
+                    <label for="frameRate">Processing Frame Rate:</label>
+                    <select id="frameRate">
+                        <option value="1">1 FPS</option>
+                        <option value="5" selected>5 FPS</option>
+                        <option value="10">10 FPS</option>
+                        <option value="15">15 FPS</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label for="autoFlag">Auto-flag Violations:</label>
+                    <input type="checkbox" id="autoFlag" checked>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveSettings" class="btn btn-primary">Save Settings</button>
+                <button id="cancelSettings" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Violation Detail Modal -->
+    <div id="violationModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Violation Details</h2>
+                <button class="modal-close" id="closeViolation">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="violationDetails">
+                    <!-- Violation details will be populated here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="acknowledgeViolation" class="btn btn-primary">Acknowledge</button>
+                <button id="dismissViolation" class="btn btn-secondary">Dismiss</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ONNX.js Runtime for YOLO -->
+    <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web@1.16.3/dist/ort.min.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="firebase-app-compat.js"></script>
+    <script src="firebase-auth-compat.js"></script>
+    <script src="firebase-firestore-compat.js"></script>
+    <script src="firebase-functions-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    
+    <!-- YOLO Model Loader -->
+    <script src="yolo-model-loader.js"></script>
+    
+    <!-- Real-time Monitoring -->
+    <script src="realtime-monitoring.js"></script>
+    
+    <script src="monitoring.js"></script>
+</body>
+</html>

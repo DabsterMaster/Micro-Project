@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Test - Exam Proctor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        video {
+            width: 100%;
+            max-width: 400px;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        .log {
+            background: #000;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        .error {
+            color: #ff6b6b;
+        }
+        .success {
+            color: #51cf66;
+        }
+        .warning {
+            color: #ffd43b;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎥 Camera Test - Exam Proctor Extension</h1>
+    
+    <div class="container">
+        <h2>Browser Support Check</h2>
+        <div id="browserSupport"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Camera Test</h2>
+        <button id="testCamera">Test Camera Access</button>
+        <button id="testScreen">Test Screen Sharing</button>
+        <button id="clearLog">Clear Log</button>
+        
+        <video id="cameraVideo" style="display: none;" autoplay muted></video>
+        <video id="screenVideo" style="display: none;" autoplay muted></video>
+    </div>
+    
+    <div class="container">
+        <h2>Debug Log</h2>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        const log = document.getElementById('log');
+        const cameraVideo = document.getElementById('cameraVideo');
+        const screenVideo = document.getElementById('screenVideo');
+        const browserSupport = document.getElementById('browserSupport');
+        
+        function addLog(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            log.appendChild(logEntry);
+            log.scrollTop = log.scrollHeight;
+            console.log(message);
+        }
+        
+        function clearLog() {
+            log.innerHTML = '';
+        }
+        
+        // Check browser support
+        function checkBrowserSupport() {
+            let support = '';
+            
+            // Check navigator.mediaDevices
+            if (navigator.mediaDevices) {
+                support += '<div class="success">✅ navigator.mediaDevices available</div>';
+            } else {
+                support += '<div class="error">❌ navigator.mediaDevices not available</div>';
+            }
+            
+            // Check getUserMedia
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                support += '<div class="success">✅ getUserMedia available</div>';
+            } else {
+                support += '<div class="error">❌ getUserMedia not available</div>';
+            }
+            
+            // Check getDisplayMedia
+            if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+                support += '<div class="success">✅ getDisplayMedia available</div>';
+            } else {
+                support += '<div class="error">❌ getDisplayMedia not available</div>';
+            }
+            
+            // Check HTTPS
+            if (location.protocol === 'https:' || location.hostname === 'localhost') {
+                support += '<div class="success">✅ HTTPS/localhost (required for camera)</div>';
+            } else {
+                support += '<div class="error">❌ Not HTTPS or localhost (camera won\'t work)</div>';
+            }
+            
+            // Check Chrome extension context
+            if (typeof chrome !== 'undefined' && chrome.runtime) {
+                support += '<div class="success">✅ Running in Chrome extension context</div>';
+            } else {
+                support += '<div class="warning">⚠️ Not in Chrome extension context</div>';
+            }
+            
+            browserSupport.innerHTML = support;
+        }
+        
+        // Test camera access
+        async function testCamera() {
+            addLog('🎥 Testing camera access...', 'info');
+            
+            try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    throw new Error('getUserMedia not supported');
+                }
+                
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: 'user'
+                    },
+                    audio: false
+                });
+                
+                addLog('✅ Camera access granted!', 'success');
+                addLog(`📹 Stream tracks: ${stream.getTracks().length}`, 'info');
+                
+                cameraVideo.srcObject = stream;
+                cameraVideo.style.display = 'block';
+                
+                // Test track properties
+                const videoTrack = stream.getVideoTracks()[0];
+                if (videoTrack) {
+                    const settings = videoTrack.getSettings();
+                    addLog(`📐 Video settings: ${JSON.stringify(settings)}`, 'info');
+                }
+                
+            } catch (error) {
+                addLog(`❌ Camera error: ${error.name} - ${error.message}`, 'error');
+                
+                if (error.name === 'NotAllowedError') {
+                    addLog('💡 Solution: Allow camera access in browser settings', 'warning');
+                } else if (error.name === 'NotFoundError') {
+                    addLog('💡 Solution: Connect a camera to your device', 'warning');
+                } else if (error.name === 'NotSupportedError') {
+                    addLog('💡 Solution: Use a different browser or update Chrome', 'warning');
+                }
+            }
+        }
+        
+        // Test screen sharing
+        async function testScreen() {
+            addLog('🖥️ Testing screen sharing...', 'info');
+            
+            try {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+                    throw new Error('getDisplayMedia not supported');
+                }
+                
+                const stream = await navigator.mediaDevices.getDisplayMedia({
+                    video: true,
+                    audio: false
+                });
+                
+                addLog('✅ Screen sharing granted!', 'success');
+                addLog(`📹 Stream tracks: ${stream.getTracks().length}`, 'info');
+                
+                screenVideo.srcObject = stream;
+                screenVideo.style.display = 'block';
+                
+                // Handle when user stops sharing
+                stream.getVideoTracks()[0].onended = () => {
+                    addLog('⏹️ Screen sharing ended', 'warning');
+                    screenVideo.style.display = 'none';
+                };
+                
+            } catch (error) {
+                addLog(`❌ Screen sharing error: ${error.name} - ${error.message}`, 'error');
+            }
+        }
+        
+        // Event listeners
+        document.getElementById('testCamera').addEventListener('click', testCamera);
+        document.getElementById('testScreen').addEventListener('click', testScreen);
+        document.getElementById('clearLog').addEventListener('click', clearLog);
+        
+        // Initialize
+        checkBrowserSupport();
+        addLog('🚀 Camera test page loaded', 'success');
+    </script>
+</body>
+</html>

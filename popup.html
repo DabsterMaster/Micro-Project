@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Exam Proctor</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Exam Proctor</h1>
+            <div class="status-indicator" id="statusIndicator">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- Login Section -->
+            <div id="loginSection" class="section active">
+                <h2>Welcome to Exam Proctor</h2>
+                <p class="login-description">Enter your credentials to access the exam system</p>
+                
+                <div class="form-group">
+                    <input type="email" id="emailInput" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="passwordInput" placeholder="Enter password" required>
+                </div>
+                
+                <button id="loginBtn" class="btn btn-primary">Login</button>
+                <button id="showRegisterBtn" class="btn btn-secondary">New User? Register Here</button>
+                
+                <div class="auth-status" id="authStatus"></div>
+                
+                <div class="connection-status" id="connectionStatus">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Connecting to server...</span>
+                </div>
+            </div>
+
+            <!-- Registration Section -->
+            <div id="registrationSection" class="section">
+                <h2>Create New Account</h2>
+                <p class="section-description">Please provide your details to create an account</p>
+                
+                <div class="form-group">
+                    <label for="regEmailInput">Email Address *</label>
+                    <input type="email" id="regEmailInput" placeholder="Enter your email address" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPasswordInput">Password *</label>
+                    <input type="password" id="regPasswordInput" placeholder="Create a password (min 6 characters)" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regConfirmPasswordInput">Confirm Password *</label>
+                    <input type="password" id="regConfirmPasswordInput" placeholder="Re-enter your password" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regFullNameInput">Full Name *</label>
+                    <input type="text" id="regFullNameInput" placeholder="Enter your full name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regCollegeInput">College/Institution Name *</label>
+                    <input type="text" id="regCollegeInput" placeholder="Enter your college or institution name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regStudentIdInput">Student ID (Optional)</label>
+                    <input type="text" id="regStudentIdInput" placeholder="Enter your student ID if applicable">
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPhoneInput">Phone Number (Optional)</label>
+                    <input type="tel" id="regPhoneInput" placeholder="Enter your phone number">
+                </div>
+                
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="regTermsCheck" required>
+                    <label for="regTermsCheck">I agree to the terms and conditions</label>
+                </div>
+                
+                <button id="registerBtn" class="btn btn-primary">Create Account</button>
+                <button id="backToLoginBtn" class="btn btn-secondary">Back to Login</button>
+                
+                <div class="auth-status" id="regAuthStatus"></div>
+            </div>
+
+            <!-- Main Options Section (After Login) -->
+            <div id="mainOptionsSection" class="section">
+                <h2>What would you like to do?</h2>
+                
+                <div class="options-grid">
+                    <div class="option-card" id="createExamOption">
+                        <div class="option-icon">📝</div>
+                        <h3>Create Exam</h3>
+                        <p>Set up a new exam with unique codes for examinees and proctors</p>
+                        <button class="btn btn-primary">Create Exam</button>
+                    </div>
+                    
+                    <div class="option-card" id="attendExamOption">
+                        <div class="option-icon">🎯</div>
+                        <h3>Attend Exam</h3>
+                        <p>Join an exam using the examinee code provided by your instructor</p>
+                        <button class="btn btn-success">Join Exam</button>
+                    </div>
+                    
+                    <div class="option-card" id="proctorExamOption">
+                        <div class="option-icon">👁️</div>
+                        <h3>Proctor Exam</h3>
+                        <p>Monitor an exam using the proctor code provided by the exam creator</p>
+                        <button class="btn btn-warning">Proctor Exam</button>
+                    </div>
+                </div>
+                
+                <div class="user-info">
+                    <p>Logged in as: <span id="userEmail"></span></p>
+                    <button id="logoutBtn" class="btn btn-danger">Logout</button>
+                </div>
+            </div>
+
+            <!-- Create Exam Section -->
+            <div id="createExamSection" class="section">
+                <h2>Create New Exam</h2>
+                <p class="section-description">Set up a new exam room with monitoring capabilities</p>
+                
+                <div class="form-group">
+                    <label for="examTitleInput">Exam Title</label>
+                    <input type="text" id="examTitleInput" placeholder="e.g., Final Mathematics Exam" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="examDescriptionInput">Description (Optional)</label>
+                    <textarea id="examDescriptionInput" placeholder="Brief description of the exam..." rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="examDuration">Duration (minutes)</label>
+                    <input type="number" id="examDuration" min="15" max="480" value="120">
+                </div>
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="orgOnlyCheck"> Organization only
+                    </label>
+                </div>
+                
+                <div class="form-group" id="orgEmailGroup" style="display: none;">
+                    <label for="orgEmailInput">Organization Email Domain</label>
+                    <input type="text" id="orgEmailInput" placeholder="e.g., company.com">
+                </div>
+                
+                <button id="createExamBtn" class="btn btn-primary">Create Exam</button>
+                <button id="backToMainBtn" class="btn btn-secondary">Back to Main Menu</button>
+                
+                <div id="examCreatedSection" class="exam-codes" style="display: none;">
+                    <h3>Exam Created Successfully! 🎉</h3>
+                    <div class="code-container">
+                        <div class="code-box">
+                            <h4>Examinee Code</h4>
+                            <div class="code" id="examineeCode"></div>
+                            <p>Share this code with students to join the exam</p>
+                        </div>
+                        <div class="code-box">
+                            <h4>Proctor Code</h4>
+                            <div class="code" id="proctorCode"></div>
+                            <p>Share this code with proctors to monitor the exam</p>
+                        </div>
+                    </div>
+                    <button id="startExamBtn" class="btn btn-success">Start Exam</button>
+                    <button id="viewExamBtn" class="btn btn-primary">View Exam Dashboard</button>
+                </div>
+            </div>
+
+            <!-- Attend Exam Section -->
+            <div id="attendExamSection" class="section">
+                <h2>Join Exam</h2>
+                <p class="section-description">Enter the examinee code provided by your instructor</p>
+                
+                <div class="form-group">
+                    <label for="examineeCodeInput">Examinee Code</label>
+                    <input type="text" id="examineeCodeInput" placeholder="Enter the examinee code" required>
+                </div>
+                
+                <button id="joinExamBtn" class="btn btn-success">Join Exam</button>
+                <button id="backToMainBtn2" class="btn btn-secondary">Back to Main Menu</button>
+                
+                <div id="examJoinedSection" class="exam-status" style="display: none;">
+                    <h3>Successfully Joined Exam! 🎯</h3>
+                    <div class="exam-info">
+                        <p><strong>Exam:</strong> <span id="joinedExamTitle"></span></p>
+                        <p><strong>Status:</strong> <span id="examStatus">Waiting to start...</span></p>
+                        <p><strong>Time Remaining:</strong> <span id="examTimeRemaining" style="color: #10b981; font-weight: 600;">--:--:--</span></p>
+                    </div>
+                    <div class="monitoring-controls">
+                        <button id="enableCameraBtn" class="btn btn-primary">Enable Camera</button>
+                        <button id="shareScreenBtn" class="btn btn-warning">Share Screen</button>
+                        <button id="debugCameraBtn" class="btn btn-secondary" style="font-size: 12px;">🔧 Debug Camera</button>
+                        <button id="leaveExamBtn" class="btn btn-danger">Leave Exam</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Proctor Exam Section -->
+            <div id="proctorExamSection" class="section">
+                <h2>Proctor Exam</h2>
+                <p class="section-description">Enter the proctor code to monitor an active exam</p>
+                
+                <div class="form-group">
+                    <label for="proctorCodeInput">Proctor Code</label>
+                    <input type="text" id="proctorCodeInput" placeholder="Enter the proctor code" required>
+                </div>
+                
+                <button id="joinProctorBtn" class="btn btn-warning">Join as Proctor</button>
+                <button id="backToMainBtn3" class="btn btn-secondary">Back to Main Menu</button>
+                
+                <div id="proctorJoinedSection" class="exam-status" style="display: none;">
+                    <h3>Proctoring Active Exam 👁️</h3>
+                    <div class="exam-info">
+                        <p><strong>Exam:</strong> <span id="proctorExamTitle"></span></p>
+                        <p><strong>Status:</strong> <span id="proctorExamStatus"></span></p>
+                        <p><strong>Active Examinees:</strong> <span id="activeExaminees">0</span></p>
+                    </div>
+                    <div class="proctor-controls">
+                        <button id="openMonitoringBtn" class="btn btn-primary">Open Monitoring Dashboard</button>
+                        <button id="refreshFeedsBtn" class="btn btn-secondary">Refresh Feeds</button>
+                        <button id="leaveProctorBtn" class="btn btn-danger">Stop Proctoring</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Exam Proctor Extension</p>
+        </footer>
+    </div>
+
+    <!-- Firebase SDK - Local files -->
+    <script src="firebase-app-compat.js"></script>
+    <script src="firebase-auth-compat.js"></script>
+    <script src="firebase-firestore-compat.js"></script>
+    <script src="firebase-functions-compat.js"></script>
+    
+    <script src="firebase-config.js"></script>
+    <script src="popup.js"></script>
+</body>
+</html>
