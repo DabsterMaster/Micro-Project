@@ -9,38 +9,6 @@ A Chrome extension for monitoring exams using the YOLO object detection model. I
 *   **Live Monitoring**: Examiners can see live feeds and get alerts for violations.
 *   **Secure**: Built on Firebase for auth and realtime database interactions.
 
-## Setup
-
-### Prerequisites
-*   Node.js & npm
-*   A Firebase project
-*   Chrome browser
-
-### Installation
-
-1.  **Clone the repo**:
-    ```bash
-    git clone https://github.com/DabsterMaster/Micro-Project.git
-    cd Micro-Project
-    ```
-
-2.  **Configure Firebase**:
-    *   Create a project in the [Firebase Console](https://console.firebase.google.com/).
-    *   Enable **Authentication** (Email/Password).
-    *   Create a **Firestore Database** (start in Test mode).
-    *   Copy your web app config and paste it into `firebase-config.js`:
-    ```javascript
-    const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-      // ... other config values
-    };
-    ```
-
-3.  **Load into Chrome**:
-    *   Go to `chrome://extensions/`.
-    *   Turn on **Developer mode** (top right).
-    *   Click **Load unpacked** and select this directory.
 
 ## Usage
 
