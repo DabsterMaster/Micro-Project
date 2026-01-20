@@ -12,20 +12,20 @@
 
 // Firebase Configuration - Replace with your actual config
 const firebaseConfig = {
-    apiKey: "AIzaSyD6xYmIIz8E5eDQ8JwsWFg_7SV4cmDUncw",
-    authDomain: "ieee-ocd.firebaseapp.com",
-    projectId: "ieee-ocd",
-    storageBucket: "ieee-ocd.firebasestorage.app",
-    messagingSenderId: "113954770966",
-    appId: "1:113954770966:web:edc28364acddf50998a537",
-    measurementId: "G-LZN9KPS4ZT"
-  };
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID",
+    measurementId: "YOUR_MEASUREMENT_ID"
+};
 
 // Cloudinary Configuration (Free alternative to Firebase Storage)
 const cloudinaryConfig = {
-    cloudName: "drgpipjhr",
-    uploadPreset: "e7vaaufv",
-    apiKey: "846615177525479"
+    cloudName: "YOUR_CLOUD_NAME",
+    uploadPreset: "YOUR_UPLOAD_PRESET",
+    apiKey: "YOUR_API_KEY"
 };
 
 /**
@@ -59,13 +59,13 @@ class FirebaseServiceManager {
 
             // Initialize services
             await this.initializeServices();
-            
+
             // Setup connection monitoring
             this.setupConnectionMonitoring();
-            
+
             this.isInitialized = true;
             this.connectionStatus = 'connected';
-            
+
             console.log('Firebase services initialized successfully');
             return true;
         } catch (error) {
@@ -156,7 +156,7 @@ class FirebaseServiceManager {
         if (this.retryCount < this.maxRetries) {
             this.retryCount++;
             console.log(`Retrying connection (${this.retryCount}/${this.maxRetries})...`);
-            
+
             setTimeout(async () => {
                 try {
                     await this.db.enableNetwork();
@@ -280,7 +280,7 @@ const storageManager = new CloudinaryStorageManager();
 async function initializeFirebase() {
     try {
         const success = await firebaseManager.initialize();
-        
+
         if (success) {
             // Make Firebase services available globally
             window.firebaseApp = {
@@ -298,7 +298,7 @@ async function initializeFirebase() {
 
             console.log('Firebase initialized successfully');
             console.log('Connection status: Connected to Firebase');
-            
+
             // Emit ready event
             window.dispatchEvent(new CustomEvent('firebaseReady', {
                 detail: { status: 'connected' }
@@ -309,7 +309,7 @@ async function initializeFirebase() {
     } catch (error) {
         console.error('Firebase initialization error:', error);
         window.firebaseReady = false;
-        
+
         // Emit error event
         window.dispatchEvent(new CustomEvent('firebaseError', {
             detail: { error: error.message }
